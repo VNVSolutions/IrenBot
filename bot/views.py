@@ -195,7 +195,7 @@ def send_order(chat_id, hall_name, contact_info):
         caption += f"🏛 Зал: {hall.name}\n"
         caption += f"📱 Контакт: {contact_info}\n"
 
-        channel_id = -1002238604187
+        channel_id = -1002297718612
         bot.send_message(channel_id, caption)
 
         bot.send_message(chat_id, 'Дякую, найближчим часом ми зв\'яжемось з Вами!')
@@ -441,7 +441,7 @@ def process_order(chat_id):
 
         order_details += f"\n💰 До сплати : {total_price}грн"
 
-        channel_id = -1002238604187
+        channel_id = -1002297718612
         bot.send_message(channel_id, order_details)
 
         basket_items.delete()
