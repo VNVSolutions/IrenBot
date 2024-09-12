@@ -1,0 +1,23 @@
+from django.contrib import admin
+from .models import UserProfile
+from .models import Categories
+from .models import Products
+from .models import ProductVariations
+from .models import ImageForMain
+from .models import BackendHall
+from .models import OrderBackendHall
+from .models import Basket
+from .models import AboutUs
+from .models import Contacts
+
+
+admin.site.register(UserProfile)
+admin.site.register(Categories)
+admin.site.register(Products)
+admin.site.register(ProductVariations)
+admin.site.register(ImageForMain)
+admin.site.register(BackendHall)
+admin.site.register(OrderBackendHall)
+admin.site.register(Basket)
+admin.site.register(AboutUs)
+admin.site.register(Contacts)

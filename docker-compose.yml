@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+  web:
+    build:
+      dockerfile: ./web/docker/Dockerfile
+      context: ./
+    environment:
+     - PYTHONUNBUFFERED=TRUE
+    volumes:
+      - .:/IrenBot
+    ports:
+      - "8006:8000"
+    networks:
+      - app
+    depends_on:
+      - db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  db:
+    image: mysql:8.0.33
+    ports:
+      - '3121:3306'
+    environment:
+      MYSQL_DATABASE: 'django'
+      MYSQL_ROOT: 'root'
+      MYSQL_ROOT_PASSWORD: 'root'
+    volumes:
+      - ./web/mysql/data:/var/lib/mysql
+      - ./web/mysql/dump:/dump
+    networks:
+      - app
+
+  redis:
+    image: "redis:alpine"
+    networks:
+      - app
+
+  celery:
+    build:
+      context: ./
+      dockerfile: ./web/docker/Dockerfile
+    command: celery -A IrenBot worker --loglevel=info
+    volumes:
+      - .:/IrenBot
+    networks:
+      - app
+    depends_on:
+      - redis
+      - web
+
+  celery-beat:
+    build:
+      context: ./
+      dockerfile: ./web/docker/Dockerfile
+    command: celery -A IrenBot beat -l info --scheduler django_celery_beat.schedulers.DatabaseScheduler
+    volumes:
+      - .:/IrenBot
+    networks:
+      - app
+    depends_on:
+      - redis
+      - celery
+      - web
+
+  nginx:
+    build: ./web/nginx
+    volumes:
+      - .:/IrenBot
+    ports:
+      - 1227:80
+    depends_on:
+      - web
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
