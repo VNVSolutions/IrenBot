@@ -213,19 +213,20 @@ def show_categories(message):
     if categories.exists():
         markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
-        for category in categories:
-            markup.add(KeyboardButton(category.categories_name))
+        markup.add(KeyboardButton('📖 Відкрити меню 📖'))
 
-        markup.add(KeyboardButton('Назад ⬅'))
-        bot.send_message(chat_id, "Оберіть категорію 🍽 ", reply_markup=markup)
+        category_buttons = [KeyboardButton(f"{category.smile} {category.categories_name}") for category in categories]
+        markup.add(*category_buttons)
+
+        bot.send_message(chat_id, "Оберіть категорію 🍽", reply_markup=markup)
     else:
         bot.send_message(chat_id, "Немає доступних категорій.")
 
 
-@bot.message_handler(func=lambda message: message.text in [category.categories_name for category in Categories.objects.filter(is_active=True)])
+@bot.message_handler(func=lambda message: any(message.text.endswith(category.categories_name) for category in Categories.objects.filter(is_active=True)))
 def show_products_details(message):
     chat_id = message.chat.id
-    selected_category_name = message.text
+    selected_category_name = message.text.split(' ', 1)[-1]
 
     try:
         category = Categories.objects.get(categories_name=selected_category_name)
@@ -233,10 +234,12 @@ def show_products_details(message):
 
         if products.exists():
             markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-            for product in products:
-                markup.add(KeyboardButton(product.name))
 
-            markup.add(KeyboardButton('Назад ⬅'))
+            markup.add(KeyboardButton('📖 Відкрити меню 📖'))
+
+            product_buttons = [KeyboardButton(f"{product.smile} {product.name}") for product in products]
+            markup.add(*product_buttons)
+
             bot.send_message(chat_id, "Оберіть продукт 🍮", reply_markup=markup)
         else:
             bot.send_message(chat_id, "Немає доступних продуктів у цій категорії.", reply_markup=create_reply_markup())
@@ -245,10 +248,10 @@ def show_products_details(message):
         bot.send_message(chat_id, "Категорія не знайдена.")
 
 
-@bot.message_handler(func=lambda message: message.text in [product.name for product in Products.objects.all()])
+@bot.message_handler(func=lambda message: any(message.text.endswith(product.name) for product in Products.objects.all()))
 def show_product_details(message):
     chat_id = message.chat.id
-    selected_product_name = message.text
+    selected_product_name = message.text.split(' ', 1)[-1]
 
     try:
         product = Products.objects.get(name=selected_product_name)
@@ -274,6 +277,7 @@ def show_product_details(message):
 
     except Products.DoesNotExist:
         bot.send_message(chat_id, "Продукт не знайдений.")
+
 
 
 @bot.message_handler(func=lambda message: message.text == 'Додати у корзину 🛒')
@@ -357,7 +361,7 @@ def show_basket(message):
 
         markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         markup.add(KeyboardButton('Замовити ✅'), KeyboardButton('Очистити ❌'))
-        markup.add(KeyboardButton('Відкрити меню'))
+        markup.add(KeyboardButton('📖 Відкрити меню 📖'))
 
         bot.send_message(chat_id, order_details, reply_markup=markup)
 
@@ -522,7 +526,7 @@ def update_basket_summary(chat_id):
         bot.send_message(chat_id, f"Сталася помилка при оновленні кошика: {str(e)}")
 
 
-@bot.message_handler(func=lambda message: message.text == 'Відкрити меню')
+@bot.message_handler(func=lambda message: message.text == '📖 Відкрити меню 📖')
 def open_main_menu(message):
     chat_id = message.chat.id
     start(message)

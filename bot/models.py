@@ -17,6 +17,7 @@ class ImageForMain(models.Model):
 class Categories(models.Model):
     categories_name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
+    smile = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -29,6 +30,7 @@ class Categories(models.Model):
 class Products(models.Model):
     image_products = models.ImageField(upload_to='img_products', blank=True)
     name = models.CharField(max_length=255)
+    smile = models.CharField(max_length=255)
     articul = models.CharField(max_length=255, null=True, blank=True)
     ingredients = models.TextField(blank=True, null=True)
     is_have_variations = models.BooleanField()
