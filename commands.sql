@@ -36,3 +36,9 @@ CREATE TABLE `backend_contacts` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `text` TEXT DEFAULT NULL
 );
+
+ALTER TABLE backend_categories CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE backend_products CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE backend_categories ADD COLUMN smile VARCHAR(255);
+ALTER TABLE backend_products ADD COLUMN smile VARCHAR(255);
