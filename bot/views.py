@@ -116,7 +116,7 @@ def show_hall_details(message):
         markup.add(KeyboardButton('Зарезервувати'))
         markup.add(KeyboardButton('Назад ⬅'))
 
-        caption = f"Зал: {hall.name}\nРозмір: {hall.size}"
+        caption = f"{hall.name}\n\n {hall.size}"
 
         if hall.img:
             with open(hall.img.path, 'rb') as image:
