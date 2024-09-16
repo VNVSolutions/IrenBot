@@ -229,32 +229,37 @@ def show_products_details(message):
     selected_category_name = message.text.split(' ', 1)[-1]
 
     try:
-        category = Categories.objects.get(categories_name=selected_category_name)
-        products = Products.objects.filter(categories=category)
+        categories = Categories.objects.filter(categories_name=selected_category_name)
 
-        if products.exists():
-            markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        if categories.exists():
+            category = categories.first()
+            products = Products.objects.filter(categories=category)
 
-            markup.add(KeyboardButton('📖 Відкрити меню 📖'))
+            if products.exists():
+                markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
-            product_buttons = [KeyboardButton(f"{product.smile} {product.name}") for product in products]
-            markup.add(*product_buttons)
+                markup.add(KeyboardButton('📖 Відкрити меню 📖'))
 
-            bot.send_message(chat_id, "Оберіть продукт 🍮", reply_markup=markup)
+                product_buttons = [KeyboardButton(f"{product.smile or ''} {product.name}") for product in products]
+                markup.add(*product_buttons)
+
+                bot.send_message(chat_id, "Оберіть продукт 🍮", reply_markup=markup)
+            else:
+                bot.send_message(chat_id, "Немає доступних продуктів у цій категорії.", reply_markup=create_reply_markup())
         else:
-            bot.send_message(chat_id, "Немає доступних продуктів у цій категорії.", reply_markup=create_reply_markup())
+            bot.send_message(chat_id, "Категорія не знайдена.")
 
     except Categories.DoesNotExist:
         bot.send_message(chat_id, "Категорія не знайдена.")
 
 
-@bot.message_handler(func=lambda message: any(message.text.endswith(product.name) for product in Products.objects.all()))
+@bot.message_handler(func=lambda message: any(message.text.strip().lower() == product.name.lower() for product in Products.objects.all()))
 def show_product_details(message):
     chat_id = message.chat.id
-    selected_product_name = message.text.split(' ', 1)[-1]
+    selected_product_name = message.text.strip()
 
     try:
-        product = Products.objects.get(name=selected_product_name)
+        product = Products.objects.get(name__iexact=selected_product_name)
 
         if chat_id in user_context:
             user_context[chat_id]['product'] = product.name
@@ -277,7 +282,6 @@ def show_product_details(message):
 
     except Products.DoesNotExist:
         bot.send_message(chat_id, "Продукт не знайдений.")
-
 
 
 @bot.message_handler(func=lambda message: message.text == 'Додати у корзину 🛒')
