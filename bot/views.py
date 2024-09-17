@@ -259,29 +259,33 @@ def show_product_details(message):
     selected_product_name = message.text.strip()
 
     try:
-        product = Products.objects.get(name__iexact=selected_product_name)
+        product = Products.objects.filter(name__iexact=selected_product_name).first()
 
-        if chat_id in user_context:
-            user_context[chat_id]['product'] = product.name
-            user_context[chat_id]['step'] = 'order_product'
-            user_context[chat_id]['product_id'] = product.id
+        if product:  # Перевіряємо, чи знайдено продукт
+            if chat_id in user_context:
+                user_context[chat_id]['product'] = product.name
+                user_context[chat_id]['step'] = 'order_product'
+                user_context[chat_id]['product_id'] = product.id
+            else:
+                user_context[chat_id] = {'product': product.name, 'step': 'order_product', 'product_id': product.id}
+
+            markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+            markup.add(KeyboardButton('Додати у корзину 🛒'))
+            markup.add(KeyboardButton('Назад ⬅'))
+
+            caption = f"🍽 Продукт: {product.name}\n💵 Ціна: {product.price} грн\n📝 Інгредієнти: {product.ingredients or 'Немає інформації'}"
+
+            if product.image_products:
+                with open(product.image_products.path, 'rb') as image:
+                    bot.send_photo(chat_id, image, caption=caption, reply_markup=markup)
+            else:
+                bot.send_message(chat_id, f"{caption}\nЗображення продукту відсутнє.", reply_markup=markup)
         else:
-            user_context[chat_id] = {'product': product.name, 'step': 'order_product', 'product_id': product.id}
+            bot.send_message(chat_id, "Продукт не знайдений.")
 
-        markup = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-        markup.add(KeyboardButton('Додати у корзину 🛒'))
-        markup.add(KeyboardButton('Назад ⬅'))
-
-        caption = f"🍽 Продукт: {product.name}\n💵 Ціна: {product.price} грн\n📝 Інгредієнти: {product.ingredients or 'Немає інформації'}"
-
-        if product.image_products:
-            with open(product.image_products.path, 'rb') as image:
-                bot.send_photo(chat_id, image, caption=caption, reply_markup=markup)
-        else:
-            bot.send_message(chat_id, f"{caption}\nЗображення продукту відсутнє.", reply_markup=markup)
-
-    except Products.DoesNotExist:
-        bot.send_message(chat_id, "Продукт не знайдений.")
+    except Exception as e:
+        bot.send_message(chat_id, "Сталася помилка.")
+        print(e)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Додати у корзину 🛒')
