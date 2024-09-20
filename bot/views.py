@@ -253,15 +253,15 @@ def show_products_details(message):
         bot.send_message(chat_id, "Категорія не знайдена.")
 
 
-@bot.message_handler(func=lambda message: any(message.text.strip().lower() == product.name.lower() for product in Products.objects.all()))
+@bot.message_handler(func=lambda message: any(message.text.endswith(product.name) for product in Products.objects.all()))
 def show_product_details(message):
     chat_id = message.chat.id
-    selected_product_name = message.text.strip()
+    selected_product_name = message.text.split(' ', 1)[-1]
 
     try:
-        product = Products.objects.filter(name__iexact=selected_product_name).first()
+        product = Products.objects.filter(name=selected_product_name).first()
 
-        if product:  # Перевіряємо, чи знайдено продукт
+        if product:
             if chat_id in user_context:
                 user_context[chat_id]['product'] = product.name
                 user_context[chat_id]['step'] = 'order_product'
@@ -286,6 +286,7 @@ def show_product_details(message):
     except Exception as e:
         bot.send_message(chat_id, "Сталася помилка.")
         print(e)
+
 
 
 @bot.message_handler(func=lambda message: message.text == 'Додати у корзину 🛒')
