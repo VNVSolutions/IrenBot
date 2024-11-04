@@ -256,7 +256,7 @@ def show_products_details(message):
 @bot.message_handler(func=lambda message: any(message.text.endswith(product.name) for product in Products.objects.all()))
 def show_product_details(message):
     chat_id = message.chat.id
-    selected_product_name = message.text.split(' ', 1)[-1]
+    selected_product_name =  re.sub(r'[^\w\s.,-]', '', message.text)
 
     try:
         product = Products.objects.filter(name=selected_product_name).first()
