@@ -260,6 +260,7 @@ def show_product_details(message):
     selected_product_name =  re.sub(r'[^\w\s.,-]', '', message.text)
 
     try:
+        print(selected_product_name)
         product = Products.objects.filter(name=selected_product_name).first()
 
         if product:
