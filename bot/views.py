@@ -257,11 +257,11 @@ def show_products_details(message):
 @bot.message_handler(func=lambda message: any(message.text.endswith(product.name) for product in Products.objects.all()))
 def show_product_details(message):
     chat_id = message.chat.id
-    selected_product_name =  re.sub(r'[^\w\s.,-]', '', message.text)
+    selected_product_name = re.sub(r'[^\w\s.,-]', '', message.text).strip()
 
     try:
         print(selected_product_name)
-        product = Products.objects.filter(name=selected_product_name).first()
+        product = Products.objects.filter(name__iexact=selected_product_name).first()
 
         if product:
             if chat_id in user_context:
