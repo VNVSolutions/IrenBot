@@ -311,7 +311,9 @@ def save_to_basket(message):
 
         if 'product_id' in user_context[chat_id]:
             product = Products.objects.get(id=user_context[chat_id]['product_id'])
-
+            if product.price is None:
+                product.price = 0
+                product.save()
             Basket.objects.create(user=user, products=product, amount=int(amount))
 
             show_basket_summary(chat_id)
@@ -339,6 +341,8 @@ def show_basket_summary(chat_id):
             for item in basket_items:
                 product = item.products
                 amount = item.amount
+                if product.price is None:
+                    product.price = 0
                 price = product.price * amount
                 total_amount += price
 
