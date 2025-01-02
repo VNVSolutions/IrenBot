@@ -42,3 +42,4 @@ ALTER TABLE backend_products CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_un
 
 ALTER TABLE backend_categories ADD COLUMN smile VARCHAR(255);
 ALTER TABLE backend_products ADD COLUMN smile VARCHAR(255);
+ALTER TABLE backend_products MODIFY COLUMN smile VARCHAR(255) NULL;

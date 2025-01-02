@@ -11,10 +11,14 @@ from .models import AboutUs
 from .models import Contacts
 
 
+@admin.register(ProductVariations)
+class ProductVariationsAdmin(admin.ModelAdmin):
+    search_fields = ['product__name', 'size', 'title']
+    list_display = ['product', 'size', 'price', 'title']
+
 admin.site.register(UserProfile)
 admin.site.register(Categories)
 admin.site.register(Products)
-admin.site.register(ProductVariations)
 admin.site.register(ImageForMain)
 admin.site.register(BackendHall)
 admin.site.register(OrderBackendHall)

@@ -30,7 +30,7 @@ class Categories(models.Model):
 class Products(models.Model):
     image_products = models.ImageField(upload_to='img_products', blank=True)
     name = models.CharField(max_length=255)
-    smile = models.CharField(max_length=255)
+    smile = models.CharField(max_length=255, blank=True, null=True)
     articul = models.CharField(max_length=255, null=True, blank=True)
     ingredients = models.TextField(blank=True, null=True)
     is_have_variations = models.BooleanField()
